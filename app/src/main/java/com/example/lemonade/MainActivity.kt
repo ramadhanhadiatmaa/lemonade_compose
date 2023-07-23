@@ -29,6 +29,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -57,11 +58,10 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LemonadeApp() {
-    var currentStep by remember {
+    var current by remember {
         mutableStateOf(1)
     }
-
-    var squeezeCount by remember {
+    var squeeze by remember {
         mutableStateOf(0)
     }
 
@@ -69,12 +69,11 @@ fun LemonadeApp() {
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
-                    Text("Lemonade",
-                    fontWeight = FontWeight.Bold)
+                    Text("Lemonade", fontWeight = FontWeight.Bold)
                 },
                 colors = TopAppBarDefaults.smallTopAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    containerColor = Color.Blue,
+                    titleContentColor = Color.White,
                     navigationIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer
                 )
             )
@@ -83,47 +82,35 @@ fun LemonadeApp() {
         modifier = Modifier
             .fillMaxSize()
             .padding(innerPadding)
-            .background(MaterialTheme.colorScheme.tertiaryContainer),
+            .background(MaterialTheme.colorScheme.onTertiaryContainer),
         color = MaterialTheme.colorScheme.background
     ) {
-        when (currentStep) {
+        when (current) {
             1 -> {
-                LemonadeTextAndImage(
-                    textLabelResourceId = R.string.tap,
-                    drawableResourceId = R.drawable.lemon_tree,
-                    contentDescriptionResourceId = R.string.lemon,
-                    onImageClick = { currentStep = 2
-                    squeezeCount = (2..4).random()})
+                LemonadeImageAndText(
+                    label = R.string.tap1,
+                    desc = R.string.desc1,
+                    img = R.drawable.lemon_tree,
+                    onClickImage = { current = 2
+                    squeeze = (3..6).random()})
             }
             2 -> {
-                LemonadeTextAndImage(
-                    textLabelResourceId = R.string.keep,
-                    drawableResourceId = R.drawable.lemon_squeeze,
-                    contentDescriptionResourceId = R.string.lemon,
-                    onImageClick = {
-                        squeezeCount--
-                        if (squeezeCount == 0){
-                            currentStep = 3
+                LemonadeImageAndText(label = R.string.tap2, desc = R.string.desc2,
+                    img = R.drawable.lemon_squeeze,
+                    onClickImage = {
+                        squeeze--
+                        if (squeeze == 0){
+                            current = 3
                         }
                     })
             }
             3 -> {
-                LemonadeTextAndImage(
-                    textLabelResourceId = R.string.drink,
-                    drawableResourceId = R.drawable.lemon_drink,
-                    contentDescriptionResourceId = R.string.glass,
-                    onImageClick = {
-                        currentStep = 4
-                    })
+                LemonadeImageAndText(label = R.string.tap3, desc = R.string.desc3, img = R.drawable.lemon_drink,
+                    onClickImage = { current = 4 })
             }
             4 -> {
-                LemonadeTextAndImage(
-                    textLabelResourceId = R.string.empty,
-                    drawableResourceId = R.drawable.lemon_restart,
-                    contentDescriptionResourceId = R.string.empty_glass,
-                    onImageClick = {
-                        currentStep = 1
-                    })
+                LemonadeImageAndText(label = R.string.tap4, desc = R.string.desc4, img = R.drawable.lemon_restart,
+                    onClickImage = { current = 1})
             }
         }
     }
@@ -132,22 +119,24 @@ fun LemonadeApp() {
 }
 
 @Composable
-fun LemonadeTextAndImage(
-    textLabelResourceId: Int,
-    drawableResourceId: Int,
-    contentDescriptionResourceId: Int,
-    onImageClick: () -> Unit,
+fun LemonadeImageAndText(
+    label: Int,
+    desc: Int,
+    img: Int,
+    onClickImage: () -> Unit,
     modifier: Modifier = Modifier) {
     Box (modifier = modifier){
-        Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center, modifier = Modifier.fillMaxSize()) {
-            Text(stringResource(textLabelResourceId), fontSize = 18.sp)
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(stringResource(label))
             Spacer(modifier = Modifier.height(16.dp))
-            Button(onClick = onImageClick) {
+            Button(onClick = onClickImage) {
                 Image(
-                    painter = painterResource(drawableResourceId),
-                    contentDescription = stringResource(
-                        contentDescriptionResourceId
-                    )
+                    painter = painterResource(img),
+                    contentDescription = stringResource(desc)
                 )
             }
         }
